@@ -26,7 +26,7 @@ defmodule Droll do
       iex> Droll.parse("1d10x5")
       {:ok, %Droll.Formula{num_dice: 1, num_sides: 10, modifier: 5, operation: :x}}
   """
-  @spec parse(iodata()) :: {:ok, Formula.t()} | {:error, String.t()}
+  @spec parse(String.t()) :: {:ok, Formula.t()} | {:error, String.t()}
   def parse(formula) do
     with {:ok, tokens, _} <- :dice_lexer.string(to_charlist(formula)),
          {:ok, {num_dice, :d, num_sides, operation, modifier}} <- :dice_parser.parse(tokens) do
@@ -52,6 +52,7 @@ defmodule Droll do
     end
   end
 
+  @spec roll(String.t()) :: {:ok, Droll.Result.t()} | {:error, String.t()}
   @doc """
   Execute a roll based on a formula. See `Droll.parse/1` for more information
   """
@@ -96,14 +97,14 @@ defmodule Droll do
 
   @spec apply_modifier(Result.t(), Formula.t()) :: Result.t()
   defp apply_modifier(result, %{modifier: modifier, operation: :+}),
-    do: %{result | total: result.total + modifier}
+    do: %{result | total: result.total + modifier, modifier: modifier}
 
   defp apply_modifier(result, %{modifier: modifier, operation: :-}),
-    do: %{result | total: result.total - modifier}
+    do: %{result | total: result.total - modifier, modifier: modifier}
 
   defp apply_modifier(result, %{modifier: modifier, operation: :/}),
-    do: %{result | total: result.total / modifier}
+    do: %{result | total: result.total / modifier, modifier: modifier}
 
   defp apply_modifier(result, %{modifier: modifier, operation: :x}),
-    do: %{result | total: result.total * modifier}
+    do: %{result | total: result.total * modifier, modifier: modifier}
 end
