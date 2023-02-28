@@ -59,7 +59,7 @@ defmodule Droll do
   def roll(formula_str) do
     with {:ok, formula} <- parse(formula_str) do
       {:ok,
-       %Result{}
+       %Result{formula: formula_str}
        |> apply_roll(formula)
        |> apply_modifier(formula)
        |> total()
@@ -100,7 +100,7 @@ defmodule Droll do
     do: %{result | total: result.total + modifier, modifier: modifier}
 
   defp apply_modifier(result, %{modifier: modifier, operation: :-}),
-    do: %{result | total: result.total - modifier, modifier: modifier}
+    do: %{result | total: result.total - modifier, modifier: -modifier}
 
   defp apply_modifier(result, %{modifier: modifier, operation: :/}),
     do: %{result | total: result.total / modifier, modifier: modifier}
