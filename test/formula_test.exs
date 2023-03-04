@@ -1,16 +1,16 @@
-defmodule DrollTest do
+defmodule FormulaTest do
   use ExUnit.Case
-  doctest Droll
+  alias Troll.Formula
+  doctest Formula
 
   describe "parse/1" do
     test "num dice" do
-      assert Droll.parse("d6") ==
-               {:ok,
-                %Droll.Formula{input: "d6", num_dice: 1, num_sides: 6, modifier: 0, operation: :+}}
+      assert Formula.parse("d6") ==
+               {:ok, %Formula{input: "d6", num_dice: 1, num_sides: 6, modifier: 0, operation: :+}}
 
-      assert Droll.parse("1d6") ==
+      assert Formula.parse("1d6") ==
                {:ok,
-                %Droll.Formula{
+                %Formula{
                   input: "1d6",
                   num_dice: 1,
                   num_sides: 6,
@@ -18,9 +18,9 @@ defmodule DrollTest do
                   operation: :+
                 }}
 
-      assert Droll.parse("10d6") ==
+      assert Formula.parse("10d6") ==
                {:ok,
-                %Droll.Formula{
+                %Formula{
                   input: "10d6",
                   num_dice: 10,
                   num_sides: 6,
@@ -28,9 +28,9 @@ defmodule DrollTest do
                   operation: :+
                 }}
 
-      assert Droll.parse("100d6") ==
+      assert Formula.parse("100d6") ==
                {:ok,
-                %Droll.Formula{
+                %Formula{
                   input: "100d6",
                   num_dice: 100,
                   num_sides: 6,
@@ -40,9 +40,9 @@ defmodule DrollTest do
     end
 
     test "num sides" do
-      assert Droll.parse("d6") ==
+      assert Formula.parse("d6") ==
                {:ok,
-                %Droll.Formula{
+                %Formula{
                   input: "d6",
                   num_dice: 1,
                   num_sides: 6,
@@ -50,9 +50,9 @@ defmodule DrollTest do
                   operation: :+
                 }}
 
-      assert Droll.parse("d60") ==
+      assert Formula.parse("d60") ==
                {:ok,
-                %Droll.Formula{
+                %Formula{
                   input: "d60",
                   num_dice: 1,
                   num_sides: 60,
@@ -60,9 +60,9 @@ defmodule DrollTest do
                   operation: :+
                 }}
 
-      assert Droll.parse("d600") ==
+      assert Formula.parse("d600") ==
                {:ok,
-                %Droll.Formula{
+                %Formula{
                   input: "d600",
                   num_dice: 1,
                   num_sides: 600,
@@ -72,9 +72,9 @@ defmodule DrollTest do
     end
 
     test "no modifier" do
-      assert Droll.parse("d20") ==
+      assert Formula.parse("d20") ==
                {:ok,
-                %Droll.Formula{
+                %Formula{
                   input: "d20",
                   num_dice: 1,
                   num_sides: 20,
@@ -82,9 +82,9 @@ defmodule DrollTest do
                   operation: :+
                 }}
 
-      assert Droll.parse("2d20") ==
+      assert Formula.parse("2d20") ==
                {:ok,
-                %Droll.Formula{
+                %Formula{
                   input: "2d20",
                   num_dice: 2,
                   num_sides: 20,
@@ -94,9 +94,9 @@ defmodule DrollTest do
     end
 
     test "addition modifier" do
-      assert Droll.parse("d20") ==
+      assert Formula.parse("d20") ==
                {:ok,
-                %Droll.Formula{
+                %Formula{
                   input: "d20",
                   num_dice: 1,
                   num_sides: 20,
@@ -104,9 +104,9 @@ defmodule DrollTest do
                   operation: :+
                 }}
 
-      assert Droll.parse("d20+1") ==
+      assert Formula.parse("d20+1") ==
                {:ok,
-                %Droll.Formula{
+                %Formula{
                   input: "d20+1",
                   num_dice: 1,
                   num_sides: 20,
@@ -114,9 +114,9 @@ defmodule DrollTest do
                   operation: :+
                 }}
 
-      assert Droll.parse("d20+5") ==
+      assert Formula.parse("d20+5") ==
                {:ok,
-                %Droll.Formula{
+                %Formula{
                   input: "d20+5",
                   num_dice: 1,
                   num_sides: 20,
@@ -126,9 +126,9 @@ defmodule DrollTest do
     end
 
     test "subtraction modifier" do
-      assert Droll.parse("d20-1") ==
+      assert Formula.parse("d20-1") ==
                {:ok,
-                %Droll.Formula{
+                %Formula{
                   input: "d20-1",
                   num_dice: 1,
                   num_sides: 20,
@@ -136,9 +136,9 @@ defmodule DrollTest do
                   operation: :-
                 }}
 
-      assert Droll.parse("d20-5") ==
+      assert Formula.parse("d20-5") ==
                {:ok,
-                %Droll.Formula{
+                %Formula{
                   input: "d20-5",
                   num_dice: 1,
                   num_sides: 20,
@@ -148,9 +148,9 @@ defmodule DrollTest do
     end
 
     test "multiplication modifier" do
-      assert Droll.parse("d20x1") ==
+      assert Formula.parse("d20x1") ==
                {:ok,
-                %Droll.Formula{
+                %Formula{
                   input: "d20x1",
                   num_dice: 1,
                   num_sides: 20,
@@ -158,9 +158,9 @@ defmodule DrollTest do
                   operation: :x
                 }}
 
-      assert Droll.parse("d20x5") ==
+      assert Formula.parse("d20x5") ==
                {:ok,
-                %Droll.Formula{
+                %Formula{
                   input: "d20x5",
                   num_dice: 1,
                   num_sides: 20,
@@ -170,9 +170,9 @@ defmodule DrollTest do
     end
 
     test "division modifier" do
-      assert Droll.parse("d20/1") ==
+      assert Formula.parse("d20/1") ==
                {:ok,
-                %Droll.Formula{
+                %Formula{
                   input: "d20/1",
                   num_dice: 1,
                   num_sides: 20,
@@ -180,9 +180,9 @@ defmodule DrollTest do
                   operation: :/
                 }}
 
-      assert Droll.parse("d20/5") ==
+      assert Formula.parse("d20/5") ==
                {:ok,
-                %Droll.Formula{
+                %Formula{
                   input: "d20/5",
                   num_dice: 1,
                   num_sides: 20,
@@ -194,17 +194,17 @@ defmodule DrollTest do
 
   describe "errors" do
     test "no input" do
-      assert Droll.parse("") == {:error, "could not decode formula"}
+      assert Formula.parse("") == {:error, "could not decode formula"}
     end
 
     test "invalid input" do
-      assert Droll.parse("asdf") == {:error, "could not decode formula. unexpected input: 'a'"}
+      assert Formula.parse("asdf") == {:error, "could not decode formula. unexpected input: 'a'"}
     end
 
     test "syntax error" do
-      assert Droll.parse("1dd") == {:error, "could not decode formula"}
-      assert Droll.parse("1d10++") == {:error, "could not decode formula"}
-      assert Droll.parse("d") == {:error, "could not decode formula"}
+      assert Formula.parse("1dd") == {:error, "could not decode formula"}
+      assert Formula.parse("1d10++") == {:error, "could not decode formula"}
+      assert Formula.parse("d") == {:error, "could not decode formula"}
     end
   end
 end
