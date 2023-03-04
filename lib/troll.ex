@@ -6,7 +6,9 @@ defmodule Troll do
   more information.
   """
 
-  alias Troll.{Formula, Roll}
+  alias Troll.Formula
+  alias Troll.Flux
+  alias Troll.Roll
 
   @type dice_formula :: String.t()
 
@@ -36,4 +38,19 @@ defmodule Troll do
   """
   @spec roll(dice_formula()) :: {:error, binary} | {:ok, Roll.t()}
   defdelegate roll(dice_formula), to: Roll
+
+  @doc """
+  Rolls two six-sided dice and returns their difference.
+
+  Equivalent to 2D6-7. Output range: -5 to 5.
+
+  ### Types
+  :neutral -> Subtracts the second die from the first.
+
+  :good -> Subtracts the smallest die from the largest.
+
+  :bad -> Subtracts the largest die from the smallest.
+  """
+  @spec flux(integer(), Flux.flux_type()) :: Flux.t()
+  defdelegate flux(modifier \\ 0, type \\ :neutral), to: Flux, as: :roll
 end

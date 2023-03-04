@@ -34,6 +34,11 @@ defmodule Troll.Roll do
     end
   end
 
+  @spec roll_dice(integer, integer) :: list(integer())
+  def roll_dice(num_dice, num_sides) when num_dice > 0 and num_sides > 1 do
+    for _ <- 1..num_dice, do: :rand.uniform(num_sides)
+  end
+
   defp new(%Formula{input: input}) do
     %__MODULE__{
       formula: input,
@@ -103,13 +108,9 @@ defmodule Troll.Roll do
 
   @spec max(t()) :: t()
   defp max(%__MODULE__{rolls: rolls} = roll),
-    do: %{roll | min: Enum.max(rolls)}
+    do: %{roll | max: Enum.max(rolls)}
 
   @spec avg(t()) :: t()
   defp avg(%__MODULE__{rolls: rolls, total: total} = roll),
     do: %{roll | avg: total / length(rolls)}
-
-  defp roll_dice(num_dice, num_sides) do
-    for _ <- 1..num_dice, do: :rand.uniform(num_sides)
-  end
 end
