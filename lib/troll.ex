@@ -37,7 +37,10 @@ defmodule Troll do
   Parses a dice formula and returns the result if successful.
   """
   @spec roll(dice_formula()) :: {:error, binary} | {:ok, Roll.t()}
-  defdelegate roll(dice_formula), to: Roll
+  defdelegate roll(dice_formula), to: Roll, as: :parse
+
+  @spec roll(pos_integer, pos_integer, number) :: Troll.Roll.t()
+  defdelegate roll(num_dice, num_sides, modifier \\ 0), to: Roll
 
   @doc """
   Rolls two six-sided dice and returns their difference.

@@ -6,12 +6,13 @@ defmodule FormulaTest do
   describe "parse/1" do
     test "num dice" do
       assert Formula.parse("d6") ==
-               {:ok, %Formula{input: "d6", num_dice: 1, num_sides: 6, modifier: 0, operation: :+}}
+               {:ok,
+                %Formula{expression: "d6", num_dice: 1, num_sides: 6, modifier: 0, operation: :+}}
 
       assert Formula.parse("1d6") ==
                {:ok,
                 %Formula{
-                  input: "1d6",
+                  expression: "1d6",
                   num_dice: 1,
                   num_sides: 6,
                   modifier: 0,
@@ -21,7 +22,7 @@ defmodule FormulaTest do
       assert Formula.parse("10d6") ==
                {:ok,
                 %Formula{
-                  input: "10d6",
+                  expression: "10d6",
                   num_dice: 10,
                   num_sides: 6,
                   modifier: 0,
@@ -31,7 +32,7 @@ defmodule FormulaTest do
       assert Formula.parse("100d6") ==
                {:ok,
                 %Formula{
-                  input: "100d6",
+                  expression: "100d6",
                   num_dice: 100,
                   num_sides: 6,
                   modifier: 0,
@@ -43,7 +44,7 @@ defmodule FormulaTest do
       assert Formula.parse("d6") ==
                {:ok,
                 %Formula{
-                  input: "d6",
+                  expression: "d6",
                   num_dice: 1,
                   num_sides: 6,
                   modifier: 0,
@@ -53,7 +54,7 @@ defmodule FormulaTest do
       assert Formula.parse("d60") ==
                {:ok,
                 %Formula{
-                  input: "d60",
+                  expression: "d60",
                   num_dice: 1,
                   num_sides: 60,
                   modifier: 0,
@@ -63,7 +64,7 @@ defmodule FormulaTest do
       assert Formula.parse("d600") ==
                {:ok,
                 %Formula{
-                  input: "d600",
+                  expression: "d600",
                   num_dice: 1,
                   num_sides: 600,
                   modifier: 0,
@@ -75,7 +76,7 @@ defmodule FormulaTest do
       assert Formula.parse("d20") ==
                {:ok,
                 %Formula{
-                  input: "d20",
+                  expression: "d20",
                   num_dice: 1,
                   num_sides: 20,
                   modifier: 0,
@@ -85,7 +86,7 @@ defmodule FormulaTest do
       assert Formula.parse("2d20") ==
                {:ok,
                 %Formula{
-                  input: "2d20",
+                  expression: "2d20",
                   num_dice: 2,
                   num_sides: 20,
                   modifier: 0,
@@ -97,7 +98,7 @@ defmodule FormulaTest do
       assert Formula.parse("d20") ==
                {:ok,
                 %Formula{
-                  input: "d20",
+                  expression: "d20",
                   num_dice: 1,
                   num_sides: 20,
                   modifier: 0,
@@ -107,7 +108,7 @@ defmodule FormulaTest do
       assert Formula.parse("d20+1") ==
                {:ok,
                 %Formula{
-                  input: "d20+1",
+                  expression: "d20+1",
                   num_dice: 1,
                   num_sides: 20,
                   modifier: 1,
@@ -117,7 +118,7 @@ defmodule FormulaTest do
       assert Formula.parse("d20+5") ==
                {:ok,
                 %Formula{
-                  input: "d20+5",
+                  expression: "d20+5",
                   num_dice: 1,
                   num_sides: 20,
                   modifier: 5,
@@ -129,7 +130,7 @@ defmodule FormulaTest do
       assert Formula.parse("d20-1") ==
                {:ok,
                 %Formula{
-                  input: "d20-1",
+                  expression: "d20-1",
                   num_dice: 1,
                   num_sides: 20,
                   modifier: 1,
@@ -139,7 +140,7 @@ defmodule FormulaTest do
       assert Formula.parse("d20-5") ==
                {:ok,
                 %Formula{
-                  input: "d20-5",
+                  expression: "d20-5",
                   num_dice: 1,
                   num_sides: 20,
                   modifier: 5,
@@ -151,7 +152,7 @@ defmodule FormulaTest do
       assert Formula.parse("d20x1") ==
                {:ok,
                 %Formula{
-                  input: "d20x1",
+                  expression: "d20x1",
                   num_dice: 1,
                   num_sides: 20,
                   modifier: 1,
@@ -161,7 +162,7 @@ defmodule FormulaTest do
       assert Formula.parse("d20x5") ==
                {:ok,
                 %Formula{
-                  input: "d20x5",
+                  expression: "d20x5",
                   num_dice: 1,
                   num_sides: 20,
                   modifier: 5,
@@ -173,7 +174,7 @@ defmodule FormulaTest do
       assert Formula.parse("d20/1") ==
                {:ok,
                 %Formula{
-                  input: "d20/1",
+                  expression: "d20/1",
                   num_dice: 1,
                   num_sides: 20,
                   modifier: 1,
@@ -183,7 +184,7 @@ defmodule FormulaTest do
       assert Formula.parse("d20/5") ==
                {:ok,
                 %Formula{
-                  input: "d20/5",
+                  expression: "d20/5",
                   num_dice: 1,
                   num_sides: 20,
                   modifier: 5,
@@ -198,7 +199,8 @@ defmodule FormulaTest do
     end
 
     test "invalid input" do
-      assert Formula.parse("asdf") == {:error, "could not decode formula. unexpected input: 'a'"}
+      assert Formula.parse("asdf") ==
+               {:error, "could not decode formula. unexpected expression: 'a'"}
     end
 
     test "syntax error" do

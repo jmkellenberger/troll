@@ -14,24 +14,32 @@ defmodule Troll.Roll do
           avg: number()
         }
 
-  @spec roll(Troll.dice_formula()) :: {:ok, Troll.t()} | {:error, String.t()}
+  @spec parse(Troll.dice_expression()) :: {:error, binary} | {:ok, Troll.Roll.t()}
   @doc """
   Execute a roll based on a formula. See `Troll.parse/1` for more information
   """
-  def roll(formula_str) do
-    with {:ok, formula} <- Formula.parse(formula_str) do
-      {
-        :ok,
-        formula
-        |> new()
-        |> apply_roll(formula)
-        |> total()
-        |> apply_modifier(formula)
-        |> min()
-        |> max()
-        |> avg()
-      }
+  def parse(formula) when is_binary(formula) do
+    with {:ok, formula} <- Formula.parse(formula) do
+      {:ok, roll(formula)}
     end
+  end
+
+  @spec roll(Troll.Formula.t()) :: Troll.Roll.t()
+  def roll(%Formula{} = formula) do
+    formula
+    |> new()
+    |> apply_roll(formula)
+    |> total()
+    |> apply_modifier(formula)
+    |> min()
+    |> max()
+    |> avg()
+  end
+
+  @spec roll(pos_integer, pos_integer, number) :: Troll.Roll.t()
+  def roll(dice, sides, modifier) do
+    Formula.new(dice, sides, modifier)
+    |> roll()
   end
 
   @spec roll_dice(integer, integer) :: list(integer())
@@ -39,7 +47,7 @@ defmodule Troll.Roll do
     for _ <- 1..num_dice, do: :rand.uniform(num_sides)
   end
 
-  defp new(%Formula{input: input}) do
+  defp new(%Formula{expression: input}) do
     %__MODULE__{
       formula: input,
       total: 0,
