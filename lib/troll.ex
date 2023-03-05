@@ -11,8 +11,6 @@ defmodule Troll do
   alias Troll.Flux
   alias Troll.Roll
 
-  @type dice_formula :: String.t()
-  @type modifier :: integer()
   @doc """
   Parse a standard dice notation formula
 
@@ -31,13 +29,13 @@ defmodule Troll do
       iex> Troll.parse("1d10x5")
       {:ok, %Troll.Formula{input: "1d10x5", num_dice: 1, num_sides: 10, modifier: 5, operation: :x}}
   """
-  @spec parse(dice_formula()) :: {:ok, Formula.t()} | {:error, String.t()}
+  @spec parse(String.t()) :: {:ok, Formula.t()} | {:error, String.t()}
   defdelegate parse(formula), to: Formula
 
   @doc """
-  Parses a dice formula and returns the result if successful.
+  Parses a dice formula and returns the roll result if successful.
   """
-  @spec roll(dice_formula()) :: {:error, binary} | {:ok, Roll.t()}
+  @spec roll(String.t()) :: {:error, binary} | {:ok, Roll.t()}
   defdelegate roll(dice_formula), to: Roll, as: :parse
 
   @spec roll(pos_integer, pos_integer, number) :: Troll.Roll.t()
@@ -55,9 +53,19 @@ defmodule Troll do
 
   :bad -> Subtracts the largest die from the smallest.
   """
-  @spec flux(integer(), Flux.flux_type()) :: Flux.t()
-  defdelegate flux(modifier \\ 0, type \\ :neutral), to: Flux, as: :roll
+  @spec flux(integer(), :neutral | :good | :bad) :: Flux.t()
+  def flux(modifier \\ 0, type \\ :neutral), do: roll(2, 6, modifier) |> Flux.flux(type)
 
-  @spec check(Check.target(), modifier, Check.check_type()) :: Check.t()
-  defdelegate check(target \\ 8, modifier \\ 0, type \\ :over), to: Check, as: :roll
+  @doc """
+  Compares the result of a 2d6 roll against a target number.
+
+  ### Check Types
+
+  over: Roll >= Target
+
+  under: Roll <= Target
+  """
+  @spec check(integer(), integer(), :over | :under) :: Check.t()
+  def check(target \\ 8, modifier \\ 0, type \\ :over),
+    do: roll(2, 6, modifier) |> Check.check(target, type)
 end

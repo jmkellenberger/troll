@@ -8,7 +8,7 @@ defmodule Troll.Roll do
           formula: Troll.dice_formula(),
           total: number(),
           rolls: [pos_integer()],
-          modifier: number(),
+          modifier: integer(),
           min: number(),
           max: number(),
           avg: number()

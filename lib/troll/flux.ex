@@ -4,14 +4,13 @@ defmodule Troll.Flux do
   defstruct ~w[type first second modifier total]a
 
   @type flux_type() :: :bad | :good | :neutral
-  @type modifier() :: number()
 
   @type t :: %__MODULE__{
           type: flux_type(),
-          total: number(),
+          total: integer(),
           first: pos_integer(),
           second: pos_integer(),
-          modifier: modifier()
+          modifier: integer()
         }
 
   defp new(type, d1, d2, modifier) do
@@ -24,21 +23,16 @@ defmodule Troll.Flux do
     }
   end
 
-  @spec roll(modifier(), flux_type()) :: Troll.Flux.t()
-  def roll(modifier, type) do
-    Roll.roll(2, 6, modifier)
-    |> flux(type)
-  end
-
-  defp flux(%Roll{max: d2, min: d1, modifier: modifier}, :bad) do
+  @spec flux(Troll.Roll.t(), flux_type()) :: Troll.Flux.t()
+  def flux(%Roll{max: d2, min: d1, modifier: modifier}, :bad) do
     new(:bad, d1, d2, modifier)
   end
 
-  defp flux(%Roll{max: d1, min: d2, modifier: modifier}, :good) do
+  def flux(%Roll{max: d1, min: d2, modifier: modifier}, :good) do
     new(:good, d1, d2, modifier)
   end
 
-  defp flux(%Roll{rolls: [d1, d2], modifier: modifier}, :neutral) do
+  def flux(%Roll{rolls: [d1, d2], modifier: modifier}, :neutral) do
     new(:neutral, d1, d2, modifier)
   end
 end

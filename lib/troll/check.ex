@@ -4,31 +4,24 @@ defmodule Troll.Check do
   defstruct ~w[type target outcome rolls modifier total]a
 
   @type check_type() :: :over | :under
-  @type target() :: pos_integer()
   @type outcome() :: :success | :failure
   @type rolls() :: list(pos_integer)
-  @type total() :: integer()
 
   @type t :: %__MODULE__{
           type: check_type,
-          target: target,
+          target: pos_integer(),
           outcome: outcome,
           rolls: rolls,
           modifier: Troll.modifier(),
-          total: total
+          total: integer()
         }
 
-  @spec roll(target, Troll.modifier(), check_type) :: t()
-  def roll(target, modifier, type) do
-    Roll.roll(2, 6, modifier)
-    |> check(target, type)
-  end
-
-  defp check(%Roll{total: total} = roll, target, :over) do
+  @spec check(Troll.Roll.t(), pos_integer(), check_type()) :: t()
+  def check(%Roll{total: total} = roll, target, :over) do
     new(:over, target, roll, outcome(total >= target))
   end
 
-  defp check(%Roll{total: total} = roll, target, :under) do
+  def check(%Roll{total: total} = roll, target, :under) do
     new(:under, target, roll, outcome(total <= target))
   end
 
