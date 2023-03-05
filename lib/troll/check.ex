@@ -7,7 +7,6 @@ defmodule Troll.Check do
   @type target() :: pos_integer()
   @type outcome() :: :success | :failure
   @type rolls() :: list(pos_integer)
-  @type modifier() :: integer()
   @type total() :: integer()
 
   @type t :: %__MODULE__{
@@ -15,53 +14,35 @@ defmodule Troll.Check do
           target: target,
           outcome: outcome,
           rolls: rolls,
-          modifier: modifier,
+          modifier: Troll.modifier(),
           total: total
         }
 
-  def roll(modifier, target, type \\ :over) do
+  @spec roll(target, Troll.modifier(), check_type) :: t()
+  def roll(target, modifier, type) do
     Roll.roll(2, 6, modifier)
-    |> IO.inspect()
     |> check(target, type)
   end
 
-  defp check(roll, target, :over) do
-    total = roll.total
-
-    outcome =
-      if total >= target do
-        :success
-      else
-        :failure
-      end
-
-    %__MODULE__{
-      type: :over,
-      target: target,
-      outcome: outcome,
-      rolls: roll.rolls,
-      modifier: roll.modifier,
-      total: total
-    }
+  defp check(%Roll{total: total} = roll, target, :over) do
+    new(:over, target, roll, outcome(total >= target))
   end
 
-  defp check(roll, target, :under) do
-    total = roll.total
+  defp check(%Roll{total: total} = roll, target, :under) do
+    new(:under, target, roll, outcome(total <= target))
+  end
 
-    outcome =
-      if total <= target do
-        :success
-      else
-        :failure
-      end
+  defp outcome(true), do: :success
+  defp outcome(false), do: :failure
 
+  defp new(type, target, roll, outcome) do
     %__MODULE__{
-      type: :under,
+      type: type,
       target: target,
       outcome: outcome,
       rolls: roll.rolls,
       modifier: roll.modifier,
-      total: total
+      total: roll.total
     }
   end
 end
