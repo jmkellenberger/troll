@@ -35,4 +35,26 @@ defmodule Troll.Flux do
   def flux(%Roll{rolls: [d1, d2], modifier: modifier}, :neutral) do
     new(:neutral, d1, d2, modifier)
   end
+
+  defimpl String.Chars do
+    def to_string(%{
+          type: type,
+          first: d1,
+          second: d2,
+          total: total,
+          modifier: modifier
+        }) do
+      t =
+        case type do
+          :neutral -> "flux"
+          type -> "#{type} flux"
+        end
+
+      mod = Troll.Formatter.format_modifier(modifier)
+
+      expression = "#{d1} - #{d2} #{mod}"
+
+      "Rolled #{t}, got: #{total} (#{expression})."
+    end
+  end
 end

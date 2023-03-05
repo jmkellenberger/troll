@@ -121,4 +121,15 @@ defmodule Troll.Roll do
   @spec avg(t()) :: t()
   defp avg(%__MODULE__{rolls: rolls, total: total} = roll),
     do: %{roll | avg: total / length(rolls)}
+
+  defimpl String.Chars do
+    def to_string(%{
+          formula: formula,
+          rolls: rolls,
+          total: total,
+          modifier: modifier
+        }) do
+      "Rolled #{formula}. Got: #{total} (#{Troll.Formatter.join_rolls(rolls, modifier)})."
+    end
+  end
 end

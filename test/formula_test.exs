@@ -200,7 +200,7 @@ defmodule FormulaTest do
 
     test "invalid input" do
       assert Formula.parse("asdf") ==
-               {:error, "could not decode formula. unexpected expression: 'a'"}
+               {:error, "could not decode formula. unexpected input: 'a'"}
     end
 
     test "syntax error" do

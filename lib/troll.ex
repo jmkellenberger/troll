@@ -32,6 +32,9 @@ defmodule Troll do
   @spec parse(String.t()) :: {:ok, Formula.t()} | {:error, String.t()}
   defdelegate parse(formula), to: Formula
 
+  @spec roll :: Troll.Roll.t()
+  def roll, do: Roll.roll(2, 6, 0)
+
   @doc """
   Parses a dice formula and returns the roll result if successful.
   """

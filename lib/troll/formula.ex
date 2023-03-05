@@ -85,8 +85,11 @@ defmodule Troll.Formula do
 
   defp format_modifier(0, _operation), do: ""
   defp format_modifier(mod, :*), do: "x#{mod}"
-  defp format_modifier(mod, :+) when mod < 0, do: to_string(mod)
-  defp format_modifier(mod, :-) when mod < 0, do: "+#{abs(mod)}"
+
+  defp format_modifier(mod, operation)
+       when operation in [:+, :-],
+       do: Troll.Formatter.format_modifier(mod)
+
   defp format_modifier(mod, operation), do: "#{operation}#{mod}"
 end
 
