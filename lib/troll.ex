@@ -6,12 +6,13 @@ defmodule Troll do
   more information.
   """
 
+  alias Troll.Check
   alias Troll.Formula
   alias Troll.Flux
   alias Troll.Roll
 
   @type dice_formula :: String.t()
-
+  @type modifier :: integer()
   @doc """
   Parse a standard dice notation formula
 
@@ -56,4 +57,7 @@ defmodule Troll do
   """
   @spec flux(integer(), Flux.flux_type()) :: Flux.t()
   defdelegate flux(modifier \\ 0, type \\ :neutral), to: Flux, as: :roll
+
+  @spec check(Check.target(), modifier, Check.check_type()) :: Check.t()
+  defdelegate check(target \\ 8, modifier \\ 0, type \\ :over), to: Check, as: :roll
 end
