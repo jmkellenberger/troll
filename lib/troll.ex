@@ -71,4 +71,20 @@ defmodule Troll do
   @spec check(integer(), integer(), :over | :under) :: Check.t()
   def check(target \\ 8, modifier \\ 0, type \\ :over),
     do: roll(2, 6, modifier) |> Check.check(target, type)
+
+  @spec check_over(String.t(), integer()) :: {:error, binary} | {:ok, Troll.Check.t()}
+  def check_over(dice, target) do
+    case roll(dice) do
+      {:ok, roll} -> {:ok, Check.check(roll, target, :over)}
+      err -> err
+    end
+  end
+
+  @spec check_under(String.t(), integer()) :: {:error, binary} | {:ok, Troll.Check.t()}
+  def check_under(dice, target) do
+    case roll(dice) do
+      {:ok, roll} -> {:ok, Check.check(roll, target, :under)}
+      err -> err
+    end
+  end
 end
