@@ -14,18 +14,23 @@ defmodule Troll.Roll do
           avg: number()
         }
 
-  @spec parse(Troll.dice_expression()) :: {:error, binary} | {:ok, Troll.Roll.t()}
   @doc """
   Execute a roll based on a formula. See `Troll.parse/1` for more information
   """
+  @spec parse(Troll.dice_expression()) :: {:error, binary} | {:ok, Troll.Roll.t()}
   def parse(formula) when is_binary(formula) do
     with {:ok, formula} <- Formula.parse(formula) do
       {:ok, roll(formula)}
     end
   end
 
-  @spec roll(Troll.Formula.t()) :: Troll.Roll.t()
-  def roll(%Formula{} = formula) do
+  @spec roll(pos_integer, pos_integer, number) :: Troll.Roll.t()
+  def roll(dice, sides, modifier) when dice > 0 and sides > 0 do
+    Formula.new(dice, sides, modifier)
+    |> roll()
+  end
+
+  defp roll(%Formula{} = formula) do
     formula
     |> new()
     |> apply_roll(formula)
@@ -36,14 +41,7 @@ defmodule Troll.Roll do
     |> avg()
   end
 
-  @spec roll(pos_integer, pos_integer, number) :: Troll.Roll.t()
-  def roll(dice, sides, modifier) do
-    Formula.new(dice, sides, modifier)
-    |> roll()
-  end
-
-  @spec roll_dice(integer, integer) :: list(integer())
-  def roll_dice(num_dice, num_sides) when num_dice > 0 and num_sides > 1 do
+  defp roll_dice(num_dice, num_sides) when num_dice > 0 and num_sides > 1 do
     for _ <- 1..num_dice, do: :rand.uniform(num_sides)
   end
 
@@ -121,15 +119,4 @@ defmodule Troll.Roll do
   @spec avg(t()) :: t()
   defp avg(%__MODULE__{rolls: rolls, total: total} = roll),
     do: %{roll | avg: total / length(rolls)}
-
-  defimpl String.Chars do
-    def to_string(%{
-          formula: formula,
-          rolls: rolls,
-          total: total,
-          modifier: modifier
-        }) do
-      "Rolled #{formula}. Got: #{total} (#{Troll.Formatter.join_rolls(rolls, modifier)})."
-    end
-  end
 end

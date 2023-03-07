@@ -19,17 +19,17 @@ defmodule Troll.Formula do
   Examples:
 
       iex> Troll.parse("d20")
-      {:ok, %Troll.Formula{expression: "d20", num_dice: 1, num_sides: 20, modifier: 0, operation: :+}}
+      {:ok, %Troll.Formula{input: "d20", num_dice: 1, num_sides: 20, modifier: 0, operation: :+}}
       iex> Troll.parse("4d6")
-      {:ok, %Troll.Formula{expression: "4d6", num_dice: 4, num_sides: 6, modifier: 0, operation: :+}}
+      {:ok, %Troll.Formula{input: "4d6", num_dice: 4, num_sides: 6, modifier: 0, operation: :+}}
       iex> Troll.parse("1d6+1")
-      {:ok, %Troll.Formula{expression: "1d6+1", num_dice: 1, num_sides: 6, modifier: 1, operation: :+}}
+      {:ok, %Troll.Formula{input: "1d6+1", num_dice: 1, num_sides: 6, modifier: 1, operation: :+}}
       iex> Troll.parse("10d5-2")
-      {:ok, %Troll.Formula{expression: "10d5-2", num_dice: 10, num_sides: 5, modifier: 2, operation: :-}}
+      {:ok, %Troll.Formula{input: "10d5-2", num_dice: 10, num_sides: 5, modifier: 2, operation: :-}}
       iex> Troll.parse("1d10/1")
-      {:ok, %Troll.Formula{expression: "1d10/1", num_dice: 1, num_sides: 10, modifier: 1, operation: :/}}
+      {:ok, %Troll.Formula{input: "1d10/1", num_dice: 1, num_sides: 10, modifier: 1, operation: :/}}
       iex> Troll.parse("1d10x5")
-      {:ok, %Troll.Formula{expression: "1d10x5", num_dice: 1, num_sides: 10, modifier: 5, operation: :x}}
+      {:ok, %Troll.Formula{input: "1d10x5", num_dice: 1, num_sides: 10, modifier: 5, operation: :x}}
   """
   @spec parse(Troll.dice_formula()) :: {:ok, __MODULE__.t()} | {:error, String.t()}
   def parse(formula) do
@@ -70,32 +70,11 @@ defmodule Troll.Formula do
   @spec new(pos_integer(), pos_integer(), integer(), operation()) :: Troll.Formula.t()
   def new(num_dice, num_sides, modifier, operation) when num_dice > 0 and num_sides > 1 do
     %__MODULE__{
-      expression: format_expression(num_dice, num_sides, modifier, operation),
+      expression: Troll.Formatter.format_expression(num_dice, num_sides, modifier, operation),
       num_dice: num_dice,
       num_sides: num_sides,
       modifier: modifier,
       operation: operation
     }
-  end
-
-  defp format_expression(num_dice, num_sides, modifier, operation),
-    do: format_dice(num_dice, num_sides) <> format_modifier(modifier, operation)
-
-  defp format_dice(num_dice, num_sides), do: "#{num_dice}d#{num_sides}"
-
-  defp format_modifier(0, _operation), do: ""
-  defp format_modifier(mod, :*), do: "x#{mod}"
-
-  defp format_modifier(mod, operation)
-       when operation in [:+, :-],
-       do: Troll.Formatter.format_modifier(mod)
-
-  defp format_modifier(mod, operation), do: "#{operation}#{mod}"
-end
-
-defimpl Inspect, for: Troll.Formula do
-  @moduledoc "Inspect protocol implementation for Troll.Formula"
-  def inspect(formula, _opts) do
-    "#Troll<#{formula.expression}>"
   end
 end
