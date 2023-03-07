@@ -38,29 +38,4 @@ defmodule Troll.Check do
       total: roll.total
     }
   end
-
-  defimpl String.Chars do
-    def to_string(%{
-          type: type,
-          rolls: rolls,
-          outcome: outcome,
-          total: total,
-          target: target,
-          modifier: modifier
-        }) do
-      sign =
-        case type do
-          :over -> "≥"
-          :under -> "≤"
-        end
-
-      outcome =
-        case outcome do
-          :success -> "Success"
-          :failure -> "Failure"
-        end
-
-      "#{outcome}. Got: #{total} #{sign} #{target} (#{Troll.Formatter.join_rolls(rolls, modifier)})."
-    end
-  end
 end

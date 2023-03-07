@@ -7,47 +7,23 @@ defmodule Troll do
   """
 
   alias Troll.Check
-  alias Troll.Formula
   alias Troll.Flux
   alias Troll.Roll
 
   @doc """
-  Parse a standard dice notation formula
-
-  Examples:
-
-      iex> Troll.parse("d20")
-      {:ok, %Troll.Formula{input: "d20", num_dice: 1, num_sides: 20, modifier: 0, operation: :+}}
-      iex> Troll.parse("4d6")
-      {:ok, %Troll.Formula{input: "4d6", num_dice: 4, num_sides: 6, modifier: 0, operation: :+}}
-      iex> Troll.parse("1d6+1")
-      {:ok, %Troll.Formula{input: "1d6+1", num_dice: 1, num_sides: 6, modifier: 1, operation: :+}}
-      iex> Troll.parse("10d5-2")
-      {:ok, %Troll.Formula{input: "10d5-2", num_dice: 10, num_sides: 5, modifier: 2, operation: :-}}
-      iex> Troll.parse("1d10/1")
-      {:ok, %Troll.Formula{input: "1d10/1", num_dice: 1, num_sides: 10, modifier: 1, operation: :/}}
-      iex> Troll.parse("1d10x5")
-      {:ok, %Troll.Formula{input: "1d10x5", num_dice: 1, num_sides: 10, modifier: 5, operation: :x}}
-  """
-  @spec parse(String.t()) :: {:ok, Formula.t()} | {:error, String.t()}
-  defdelegate parse(formula), to: Formula
-
-  @spec roll :: Troll.Roll.t()
-  def roll, do: Roll.roll(2, 6, 0)
-
-  @doc """
   Parses a dice formula and returns the roll result if successful.
   """
-  @spec roll(String.t()) :: {:error, binary} | {:ok, Roll.t()}
-  defdelegate roll(dice_formula), to: Roll, as: :parse
+  @spec parse_roll(String.t()) :: {:error, binary} | {:ok, Roll.t()}
+  defdelegate parse_roll(dice_formula), to: Roll, as: :parse
 
+  @doc """
+  Rolls a number of dice with the given sides and applies the modifier to the result
+  """
   @spec roll(pos_integer, pos_integer, number) :: Troll.Roll.t()
   defdelegate roll(num_dice, num_sides, modifier \\ 0), to: Roll
 
   @doc """
-  Rolls two six-sided dice and returns their difference.
-
-  Equivalent to 2D6-7. Output range: -5 to 5.
+  Rolls two dice and returns their difference.
 
   ### Types
   :neutral -> Subtracts the second die from the first.
@@ -56,19 +32,55 @@ defmodule Troll do
 
   :bad -> Subtracts the largest die from the smallest.
   """
-  @spec flux(integer(), :neutral | :good | :bad) :: Flux.t()
-  def flux(modifier \\ 0, type \\ :neutral), do: roll(2, 6, modifier) |> Flux.flux(type)
+  @spec flux(integer(), pos_integer(), Flux.flux_type()) :: Flux.t()
+  def flux(modifier \\ 0, sides \\ 6, type \\ :neutral) do
+    roll(2, sides, modifier)
+    |> Flux.flux(type)
+  end
 
   @doc """
-  Compares the result of a 2d6 roll against a target number.
-
-  ### Check Types
-
-  over: Roll >= Target
-
-  under: Roll <= Target
+  Rolls two dice and subtracts the smaller roll from the larger.
   """
-  @spec check(integer(), integer(), :over | :under) :: Check.t()
-  def check(target \\ 8, modifier \\ 0, type \\ :over),
-    do: roll(2, 6, modifier) |> Check.check(target, type)
+  @spec good_flux(integer(), pos_integer()) :: Flux.t()
+  def good_flux(modifier \\ 0, sides \\ 6), do: flux(modifier, sides, :good)
+
+  @doc """
+  Rolls two dice and subtracts the larger from the smaller.
+  """
+  @spec bad_flux(integer(), pos_integer()) :: Flux.t()
+  def bad_flux(modifier \\ 0, sides \\ 6), do: flux(modifier, sides, :bad)
+
+  @doc """
+  Rolls the given dice expression and checks whether it is equal to or greater than the target number.
+  """
+  @spec check_over(String.t(), integer()) :: {:error, binary} | {:ok, Troll.Check.t()}
+  def check_over(dice, target) do
+    case parse_roll(dice) do
+      {:ok, roll} -> {:ok, Check.check(roll, target, :over)}
+      err -> err
+    end
+  end
+
+  @spec check_over(pos_integer(), pos_integer(), integer(), integer()) :: Troll.Check.t()
+  def check_over(num_dice, num_sides, modifier, target) do
+    roll(num_dice, num_sides, modifier)
+    |> Check.check(target, :over)
+  end
+
+  @doc """
+  Rolls the given dice expression and checks whether it is equal to or less than the target number.
+  """
+  @spec check_under(String.t(), integer()) :: {:error, binary} | {:ok, Troll.Check.t()}
+  def check_under(dice, target) do
+    case parse_roll(dice) do
+      {:ok, roll} -> {:ok, Check.check(roll, target, :under)}
+      err -> err
+    end
+  end
+
+  @spec check_under(pos_integer(), pos_integer(), integer(), integer()) :: Troll.Check.t()
+  def check_under(num_dice, num_sides, modifier, target) do
+    roll(num_dice, num_sides, modifier)
+    |> Check.check(target, :under)
+  end
 end
